@@ -17,11 +17,12 @@ void setup() {
 
 void loop() {
   int message = Serial.read();
-  send_message(MOVE_FORWARD);
-  delay(50);
-  send_message(MOVE_BACK);
-  delay(50);
-  /*if (Serial.available() > 0) {
+  //send_message(MOVE_FORWARD);
+  //delay(1000);
+  //send_message(MOVE_BACK);
+  //delay(1000);
+  digitalWrite(LED_PIN, LOW);
+  if (Serial.available() > 0) {
     if (message == 41) {
       send_message(MOVE_FORWARD);
     } else if (message == 42) {
@@ -31,7 +32,7 @@ void loop() {
     } else if (message == 44) {
       send_message(MOVE_RIGHT);
     }
-  }*/
+  }
 }
 
 void send_message(char *command) {
@@ -39,6 +40,6 @@ void send_message(char *command) {
   vw_send((uint8_t *)message, strlen(message));
   vw_wait_tx();
   Serial.println(command);
-  digitalWrite(LED_PIN, HIGH); 
+  digitalWrite(LED_PIN, HIGH);
 }
 

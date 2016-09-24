@@ -30,21 +30,25 @@ void setup() {
 void loop() {
   uint8_t buf[VW_MAX_MESSAGE_LEN];
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
-  if (vw_get_message(buf, &buflen)) {  // Не блокируется
+  /*if (vw_get_message(buf, &buflen)) {  // Не блокируется
     if (buf[0] == 'c' && buf[1] == 'm') {
-      digitalWrite(LED_PIN,HIGH);
+      //digitalWrite(LED_PIN,HIGH);
       Serial.println("got command");
       if (buf[2] == '4') {
         if (buf[3] == '1') {
+          digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Forward");
           motor_state(1, HALF, HALF);  
         } else if (buf[3] == '2') {
+          digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Back");
           motor_state(2, HALF, HALF);
         } else if (buf[3] == '3') {
+          digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Left");
           motor_state(1, HALF, STOP);
         } else if (buf[3] == '4') {
+          digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Right");
           motor_state(1, STOP, HALF);
         }       
@@ -55,28 +59,45 @@ void loop() {
       Serial.println("have not command");
       motor_state(0, STOP, STOP); 
     }
-  }
-  digitalWrite(LED_PIN,LOW);
-  Serial.println("have not nothing");
+  }*/
+  digitalWrite(LED_PIN, HIGH);
+  //Serial.println("have not nothing");
   motor_state(0, STOP, STOP);
+  delay(1000);
+  digitalWrite(LED_PIN, LOW);
+  //Serial.println("have not nothing");
+  motor_state(1, HALF, HALF);
+  delay(1000);
 }
 
 void motor_state(int state, int rightMotor, int leftMotor) {
   int in1, in2, in3, in4;
   if (state == 0) {
     in1 = in2 = in3 = in4 = 0;
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
   } else if (state == 1) {
     in1 = in4 = 255;
     in2 = in3 = 0;
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
   } else {
     in1 = in4 = 0;
     in2 = in3 = 255;
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
   }
   
-  digitalWrite(IN1, in1);
+  /*digitalWrite(IN1, in1);
   digitalWrite(IN2, in2);
   digitalWrite(IN3, in3);
-  digitalWrite(IN4, in4);
+  digitalWrite(IN4, in4);*/
   analogWrite(ENA, rightMotor);
   analogWrite(ENB, leftMotor);
 }
