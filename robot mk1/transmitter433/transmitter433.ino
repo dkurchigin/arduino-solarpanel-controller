@@ -17,8 +17,11 @@ void setup() {
 
 void loop() {
   int message = Serial.read();
-  
-  if (Serial.available() > 0) {
+  send_message(MOVE_FORWARD);
+  delay(50);
+  send_message(MOVE_BACK);
+  delay(50);
+  /*if (Serial.available() > 0) {
     if (message == 41) {
       send_message(MOVE_FORWARD);
     } else if (message == 42) {
@@ -28,7 +31,7 @@ void loop() {
     } else if (message == 44) {
       send_message(MOVE_RIGHT);
     }
-  }
+  }*/
 }
 
 void send_message(char *command) {
