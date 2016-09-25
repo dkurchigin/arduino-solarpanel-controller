@@ -33,46 +33,40 @@ void loop() {
   if (vw_get_message(buf, &buflen)) {  // Не блокируется
     Serial.println(buf[0]);
     if (buf[0] == 'c' && buf[1] == 'm') {
-      //digitalWrite(LED_PIN,HIGH);
-      //Serial.println("got command");
       if (buf[2] == '4') {
-        if (buf[3] == '1') {
+        if (buf[3] == '0') {
+          digitalWrite(LED_PIN,HIGH);
+          Serial.println("Stop Moving");
+          motor_state(0, STOP, STOP);
+          delay(100);  
+        } else if (buf[3] == '1') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Forward");
           motor_state(1, HALF, HALF);
-          delay(100);  
+          delay(10);  
         } else if (buf[3] == '2') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Back");
           motor_state(2, HALF, HALF);
-          delay(100);
+          delay(10);
         } else if (buf[3] == '3') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Left");
           motor_state(1, HALF, STOP);
-          delay(100);
+          delay(10);
         } else if (buf[3] == '4') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Right");
           motor_state(1, STOP, HALF);
-          delay(100);
+          delay(10);
         }       
       }
     }
     if (buf[0]=='0') {
       digitalWrite(LED_PIN,LOW);
-      //Serial.println("have not command");
       motor_state(0, STOP, STOP); 
     }
   }
-  /*digitalWrite(LED_PIN, HIGH);
-  //Serial.println("have not nothing");
-  motor_state(0, STOP, STOP);
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
-  //Serial.println("have not nothing");
-  motor_state(1, HALF, HALF);
-  delay(1000);*/
 }
 
 void motor_state(int state, int rightMotor, int leftMotor) {

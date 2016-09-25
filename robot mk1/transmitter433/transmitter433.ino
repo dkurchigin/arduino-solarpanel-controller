@@ -2,6 +2,7 @@
 
 #define LED_PIN 13
 
+#define STOP_MOVING "cm40"
 #define MOVE_FORWARD "cm41"
 #define MOVE_BACK "cm42"
 #define MOVE_LEFT "cm43"
@@ -19,35 +20,21 @@ void setup() {
 }
 
 void loop() {
-  
-  //send_message(MOVE_FORWARD);
-  //delay(1000);
-  //send_message(MOVE_BACK);
-  //delay(1000);
   digitalWrite(LED_PIN, LOW);
   if (Serial.available() > 0) {
     message = Serial.read();
-    if (message == '1') {
+    if (message == '0') {
+      send_message(STOP_MOVING);
+    } else if (message == '1') {
       send_message(MOVE_FORWARD);
-      //cont = MOVE_FORWARD;
-      //vw_send((uint8_t *)cont, strlen(cont));
-      //vw_wait_tx();
     } else if (message == '2') {
       send_message(MOVE_BACK);
     } else if (message == '3') {
       send_message(MOVE_LEFT);
     } else if (message == '4') {
       send_message(MOVE_RIGHT);
-    }
+    } 
   }
-  /*cont = MOVE_FORWARD;
-  vw_send((uint8_t *)cont, strlen(cont));
-  vw_wait_tx();
-  delay(2000);
-  cont = MOVE_BACK;
-  vw_send((uint8_t *)cont, strlen(cont));
-  vw_wait_tx();
-  delay(2000);*/
 }
 
 void send_message(char *command) {
