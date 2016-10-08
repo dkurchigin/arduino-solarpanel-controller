@@ -42,12 +42,12 @@ void loop() {
         } else if (buf[3] == '1') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Forward");
-          motor_state(1, HALF, HALF);
+          motor_state(1, HALF, HALF  + 50);
           delay(10);  
         } else if (buf[3] == '2') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Back");
-          motor_state(2, HALF, HALF);
+          motor_state(2, HALF, HALF  + 50);
           delay(10);
         } else if (buf[3] == '3') {
           digitalWrite(LED_PIN,HIGH);
@@ -57,7 +57,7 @@ void loop() {
         } else if (buf[3] == '4') {
           digitalWrite(LED_PIN,HIGH);
           Serial.println("Move Right");
-          motor_state(1, STOP, HALF);
+          motor_state(1, STOP, HALF + 50);
           delay(10);
         }       
       }
