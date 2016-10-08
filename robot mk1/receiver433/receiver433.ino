@@ -23,7 +23,7 @@ void setup() {
   pinMode(IN1, OUTPUT);
   vw_set_ptt_inverted(true); // необходимо для модуля DR3100
   vw_set_rx_pin(12);
-  vw_setup(4000); // бит в секунду
+  vw_setup(1000); // бит в секунду
   vw_rx_start(); // запуск фазовой автоподстройки частоты (ФАПЧ)
 }
 
