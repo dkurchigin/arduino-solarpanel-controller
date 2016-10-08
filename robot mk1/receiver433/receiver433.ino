@@ -21,16 +21,16 @@ void setup() {
   pinMode(IN3, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN1, OUTPUT);
-  vw_set_ptt_inverted(true); // необходимо для модуля DR3100
+  vw_set_ptt_inverted(true); 
   vw_set_rx_pin(12);
-  vw_setup(1000); // бит в секунду
-  vw_rx_start(); // запуск фазовой автоподстройки частоты (ФАПЧ)
+  vw_setup(1000); 
+  vw_rx_start(); 
 }
 
 void loop() {
   uint8_t buf[VW_MAX_MESSAGE_LEN];
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
-  if (vw_get_message(buf, &buflen)) {  // Не блокируется
+  if (vw_get_message(buf, &buflen)) {  
     Serial.println(buf[0]);
     if (buf[0] == 'c' && buf[1] == 'm') {
       if (buf[2] == '4') {

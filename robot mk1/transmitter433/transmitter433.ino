@@ -16,7 +16,7 @@ void setup() {
   pinMode(LED_PIN,OUTPUT);
   vw_set_ptt_inverted(true);
   vw_set_tx_pin(12);
-  vw_setup(1000);// скорость передачи данных в Kbps
+  vw_setup(1000);
 }
 
 void loop() {
