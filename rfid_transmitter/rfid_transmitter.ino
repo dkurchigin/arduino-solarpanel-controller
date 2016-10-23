@@ -2,8 +2,8 @@
 #include <Ethernet2.h>
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
-char server[] = "www.google.com";    // name address for Google (using DNS)
+IPAddress server(192, 168, 8, 2);  // numeric IP for Google (no DNS)
+//char server[] = "www.google.com";    // name address for Google (using DNS)
 IPAddress ip(192, 168, 8, 8);
 EthernetClient client;
 
@@ -24,9 +24,9 @@ void setup() {
   if (client.connect(server, 80)) {
     //Serial.println("connected");
     // Make a HTTP request:
-    client.println("GET /search?q=arduino HTTP/1.1");
-    client.println("Host: www.google.com");
-    client.println("Connection: close");
+    client.println("GET /heandler.pl?login=arduino&password=huy HTTP/1.1");
+    //client.println("Host: 192.168.8.2");
+    //client.println("Connection: close");
     client.println();
   }
   else {
