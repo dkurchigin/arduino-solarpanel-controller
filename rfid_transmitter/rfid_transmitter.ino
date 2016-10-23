@@ -8,46 +8,50 @@ IPAddress ip(192, 168, 8, 8);
 EthernetClient client;
 
 void setup() {
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
   Ethernet.begin(mac, ip);
   //}
   // give the Ethernet shield a second to initialize:
   delay(1000);
-  Serial.println("connecting...");  
+  Serial.println("connecting...");
+
+  // if you get a connection, report back via serial:
+  if (client.connect(server, 80)) {
+    //Serial.println("connected");
+    // Make a HTTP request:
+    client.println("GET /search?q=arduino HTTP/1.1");
+    client.println("Host: www.google.com");
+    client.println("Connection: close");
+    client.println();
+  }
+  else {
+    // kf you didn't get a connection to the server:
+    Serial.println("connection failed");
+  }
 }
 
 void loop()
 {
   // if there are incoming bytes available
   // from the server, read them and print them:
-  if (client.connect(server, 80)) {
-    sentRequest;
-  }
   if (client.available()) {
     char c = client.read();
-    Serial.print(c);
+    //Serial.print(c);
   }
-  digitalWrite(13, LOW);
-  delay(5000);
+
   // if the server's disconnected, stop the client:
-  /*if (!client.connected()) {
+  if (!client.connected()) {
     Serial.println();
     Serial.println("disconnecting.");
     client.stop();
 
     // do nothing forevermore:
     while (true);
-  }*/
-}
-
-void sentRequest() {
-  //Serial.println("connected");
-  // Make a HTTP request:
-  digitalWrite(13, HIGH);
-  client.println("GET /search?q=arduino HTTP/1.1");
-  client.println("Host: www.google.com");
-  client.println("Connection: close");
-  client.println();
+  }
 }
 
