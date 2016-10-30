@@ -12,6 +12,8 @@
 #define HALF 150
 #define FULL 255 
 
+int timer;
+
 void setup() {
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT);
@@ -31,7 +33,6 @@ void loop() {
   uint8_t buf[VW_MAX_MESSAGE_LEN];
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
   if (vw_get_message(buf, &buflen)) {  
-    Serial.println(buf[0]);
     if (buf[0] == 'c' && buf[1] == 'm') {
       if (buf[2] == '4') {
         if (buf[3] == '0') {
@@ -41,25 +42,29 @@ void loop() {
         } else if (buf[3] == '1') {
           digitalWrite(LED_PIN,HIGH);
           motor_state(1, HALF, FULL);
-          delay(10);  
+          delay(100);  
         } else if (buf[3] == '2') {
           digitalWrite(LED_PIN,HIGH);
           motor_state(2, HALF, FULL);
-          delay(10);
+          delay(100);
         } else if (buf[3] == '3') {
           digitalWrite(LED_PIN,HIGH);
           motor_state(1, HALF, STOP);
-          delay(10);
+          delay(100);
         } else if (buf[3] == '4') {
           digitalWrite(LED_PIN,HIGH);
           motor_state(1, STOP, FULL);
-          delay(10);
+          delay(100);
         }       
       }
     }
   } else {
-    digitalWrite(LED_PIN,LOW);
-    motor_state(0, STOP, STOP);
+    if (millis() - timer >= 200) {
+      digitalWrite(LED_PIN,LOW);
+      //delay(100);
+      motor_state(0, STOP, STOP);
+      timer = millis();
+    }
   }
 }
 
