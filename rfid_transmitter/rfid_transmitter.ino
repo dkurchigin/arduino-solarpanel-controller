@@ -24,9 +24,9 @@ void setup() {
   if (client.connect(server, 80)) {
     //Serial.println("connected");
     // Make a HTTP request:
-    client.println("GET /heandler.pl?login=arduino&password=huy HTTP/1.1");
-    //client.println("Host: 192.168.8.2");
-    //client.println("Connection: close");
+    client.println("GET /test_params.pl?name=ardu&color=green HTTP/1.1");
+    client.println("Host: 192.168.8.2");
+    client.println("Connection: close");
     client.println();
   }
   else {
@@ -41,7 +41,7 @@ void loop()
   // from the server, read them and print them:
   if (client.available()) {
     char c = client.read();
-    //Serial.print(c);
+    Serial.print(c);
   }
 
   // if the server's disconnected, stop the client:
