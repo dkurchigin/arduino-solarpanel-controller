@@ -6,6 +6,7 @@
 #define BUZZER 3
 #define GREEN_LED 5
 #define RED_LED 4
+#define REED_SWITCH 6
 
 #define SS_PIN 8
 #define RST_PIN 7
@@ -26,6 +27,7 @@ void setup() {
   pinMode(BUZZER, OUTPUT);    
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);  
+  pinMode(REED_SWITCH, INPUT);
 
   digitalWrite(RED_LED, HIGH);
   digitalWrite(GREEN_LED, LOW);
@@ -131,8 +133,10 @@ void sendPost() {
     client.print("name=post88&color=pink");
     client.println();
     tone(BUZZER, 523, 200);
+    sendReedState();
   } else {
     Serial.println("connection failed");
+    sendReedState();
   }  
 }
 
@@ -142,3 +146,10 @@ void printDec(byte *buffer, byte bufferSize) {
     Serial.print(buffer[i], DEC);
   }
 }
+
+int sendReedState() {
+  int state = digitalRead(REED_SWITCH);
+  Serial.println(state);
+  return state;
+}
+
