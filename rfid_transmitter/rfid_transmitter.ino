@@ -7,6 +7,7 @@
 #define GREEN_LED 5
 #define RED_LED 4
 #define REED_SWITCH 6
+#define SOLENOID A2
 
 #define SS_PIN 8
 #define RST_PIN 7
@@ -28,7 +29,9 @@ void setup() {
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);  
   pinMode(REED_SWITCH, INPUT);
+  pinMode(SOLENOID, OUTPUT);
 
+  digitalWrite(SOLENOID, HIGH);
   digitalWrite(RED_LED, HIGH);
   digitalWrite(GREEN_LED, LOW);
 
@@ -134,9 +137,15 @@ void sendPost() {
     client.println();
     tone(BUZZER, 523, 200);
     sendReedState();
+    digitalWrite(SOLENOID, HIGH);
+    delay(300);
+    digitalWrite(SOLENOID, LOW);
   } else {
     Serial.println("connection failed");
     sendReedState();
+    digitalWrite(SOLENOID, LOW);
+    delay(1000);
+    digitalWrite(SOLENOID, HIGH);
   }  
 }
 
