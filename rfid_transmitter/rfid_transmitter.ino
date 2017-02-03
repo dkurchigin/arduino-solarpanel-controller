@@ -8,6 +8,7 @@
 #define RED_LED 4
 #define REED_SWITCH 6
 #define SOLENOID A2
+#define ANOTHER_GND A3
 
 #define SS_PIN 8
 #define RST_PIN 7
@@ -30,10 +31,12 @@ void setup() {
   pinMode(RED_LED, OUTPUT);  
   pinMode(REED_SWITCH, INPUT);
   pinMode(SOLENOID, OUTPUT);
+  pinMode(ANOTHER_GND, OUTPUT);
 
   digitalWrite(SOLENOID, HIGH);
   digitalWrite(RED_LED, HIGH);
   digitalWrite(GREEN_LED, LOW);
+  digitalWrite(ANOTHER_GND, LOW);
 
   Ethernet.begin(mac, ip);
   delay(1000);
@@ -142,9 +145,10 @@ void sendPost() {
     digitalWrite(SOLENOID, LOW);
   } else {
     Serial.println("connection failed");
+    tone(BUZZER, 523, 200);
     sendReedState();
     digitalWrite(SOLENOID, LOW);
-    delay(1000);
+    delay(3000);
     digitalWrite(SOLENOID, HIGH);
   }  
 }
