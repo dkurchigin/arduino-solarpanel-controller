@@ -13,6 +13,8 @@
 #define SS_PIN 8
 #define RST_PIN 7
 
+boolean doorIsOpen = false;
+
 boolean buttonWasUp = true;
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress server(192, 168, 8, 2); 
@@ -53,6 +55,10 @@ void setup() {
 
 void loop() {
   boolean buttonUp = digitalRead(BUTTON);
+  statusPresentation(0);
+  if (doorIsOpen) {
+    statusPresentation(3);
+  }
   
   if (!buttonUp && buttonWasUp) {
     delay(10);
@@ -95,6 +101,7 @@ void loop() {
     Serial.print(F("In dec: "));
     printDec(rfid.uid.uidByte, rfid.uid.size);
     Serial.println();
+    sendPost();
   }
   else {
     Serial.println(F("Card read previously."));
@@ -108,6 +115,7 @@ void loop() {
   rfid.PCD_StopCrypto1();
   
   buttonWasUp = buttonUp;
+  
 }
 
 void sendRequest() {
@@ -138,18 +146,11 @@ void sendPost() {
     client.println();
     client.print("name=post88&color=pink");
     client.println();
-    tone(BUZZER, 523, 200);
-    sendReedState();
-    digitalWrite(SOLENOID, HIGH);
-    delay(300);
-    digitalWrite(SOLENOID, LOW);
+    changeSolenoidState(0);
   } else {
     Serial.println("connection failed");
-    tone(BUZZER, 523, 200);
-    sendReedState();
-    digitalWrite(SOLENOID, LOW);
-    delay(3000);
-    digitalWrite(SOLENOID, HIGH);
+    changeSolenoidState(0);
+    //changeSolenoidState(2);
   }  
 }
 
@@ -160,9 +161,63 @@ void printDec(byte *buffer, byte bufferSize) {
   }
 }
 
+
+
 int sendReedState() {
   int state = digitalRead(REED_SWITCH);
+  if (state == 0) {
+    doorIsOpen = true;
+  } else {
+    doorIsOpen = false;
+  }
   Serial.println(state);
   return state;
+}
+
+void changeSolenoidState(int command) {
+  if (command == 0) {
+    statusPresentation(1);
+    changeSolenoidState(1);
+    delay(5000);
+  } else if (command == 1) {
+    digitalWrite(SOLENOID, LOW);
+  } else if (command == 2) {
+    digitalWrite(SOLENOID, HIGH); 
+  }
+  if (sendReedState() == 1) {
+      changeSolenoidState(2);
+      statusPresentation(0);  
+    } else {
+      statusPresentation(3);
+    }
+}
+
+void statusPresentation(int command) {
+  if (command == 0) {
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(GREEN_LED, LOW);    
+  } else if (command == 1) {
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(GREEN_LED, HIGH);
+    tone(BUZZER, 700, 200);
+  } else if (command == 2) {
+    tone(BUZZER, 500, 200);
+  } else if (command == 3) {
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(GREEN_LED, HIGH);
+    tone(BUZZER, 800, 100);
+    delay(200);
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(GREEN_LED, LOW);
+    tone(BUZZER, 800, 100);
+    delay(200);
+  } else if (command == 4) {
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(GREEN_LED, HIGH);
+    delay(100);
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(GREEN_LED, LOW);
+    delay(100);
+  }
 }
 
