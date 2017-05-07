@@ -9,21 +9,21 @@
 #define REED_SWITCH 6
 #define SOLENOID A2
 #define ANOTHER_GND A3
-
 #define SS_PIN 8
 #define RST_PIN 7
 
 boolean doorIsOpen = false;
-
 boolean buttonWasUp = true;
+
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress server(192, 168, 8, 2); 
+IPAddress pi_server(192, 168, 8, 2); 
 IPAddress ip(192, 168, 8, 8);
 EthernetClient client;
 
 MFRC522 rfid(SS_PIN, RST_PIN); 
 MFRC522::MIFARE_Key key;
 byte nuidPICC[3];
+
 
 void setup() {
   Serial.begin(9600);
@@ -34,7 +34,6 @@ void setup() {
   pinMode(REED_SWITCH, INPUT);
   pinMode(SOLENOID, OUTPUT);
   pinMode(ANOTHER_GND, OUTPUT);
-
   digitalWrite(SOLENOID, HIGH);
   digitalWrite(RED_LED, HIGH);
   digitalWrite(GREEN_LED, LOW);
@@ -53,6 +52,7 @@ void setup() {
   Serial.print(F("Using the following key:"));
 }
 
+
 void loop() {
   boolean buttonUp = digitalRead(BUTTON);
   statusPresentation(0);
@@ -60,7 +60,7 @@ void loop() {
     statusPresentation(3);
   }
   
-  if (!buttonUp && buttonWasUp) {
+  /*if (!buttonUp && buttonWasUp) {
     delay(10);
     buttonUp = digitalRead(BUTTON);
     if (!buttonUp) {
@@ -70,7 +70,7 @@ void loop() {
       sendPost();
       digitalWrite(GREEN_LED, LOW);
     }
-  }
+  }*/
 
   if ( ! rfid.PICC_IsNewCardPresent())
     return;
@@ -120,7 +120,7 @@ void loop() {
 
 void sendRequest() {
   client.stop();
-  if(client.connect(server, 80)) {
+  if(client.connect(pi_server, 80)) {
     Serial.println("connected");
     client.println("GET /test_params.pl?name=ardu88&color=nicegreen HTTP/1.1");
     client.println("Host: 192.168.8.2");
@@ -135,7 +135,7 @@ void sendPost() {
   client.stop();
   char str[] = "name=post88";
   char str2[] = "color=yellow";
-  if(client.connect(server, 80)) {
+  if(client.connect(pi_server, 80)) {
     Serial.println("connected");
     client.println("POST /test_params.pl HTTP/1.1");
     client.println("Host: 192.168.8.2");
@@ -160,8 +160,6 @@ void printDec(byte *buffer, byte bufferSize) {
     Serial.print(buffer[i], DEC);
   }
 }
-
-
 
 int sendReedState() {
   int state = digitalRead(REED_SWITCH);
