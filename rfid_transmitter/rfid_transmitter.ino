@@ -19,6 +19,7 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress pi_server(192, 168, 8, 2); 
 IPAddress ip(192, 168, 8, 8);
 EthernetClient client;
+EthernetServer server(80);
 
 MFRC522 rfid(SS_PIN, RST_PIN); 
 MFRC522::MIFARE_Key key;
@@ -40,6 +41,7 @@ void setup() {
   digitalWrite(ANOTHER_GND, LOW);
 
   Ethernet.begin(mac, ip);
+  server.begin();
   delay(1000);
   Serial.println("connecting...");
 
@@ -59,6 +61,26 @@ void loop() {
   if (doorIsOpen) {
     statusPresentation(3);
   }
+
+  EthernetClient client = server.available();
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println("Connnection: close");
+  client.println();
+  client.println("<!DOCTYPE html>");   //web страница создана с помощью html
+  client.println("<html>");
+  client.println("<head>");
+  client.println("<title>Ethernet Tutorial</title>");
+  client.println("<meta http-equiv=\"refresh\" content=\"1\">");
+  client.println("</head>");
+  client.println("<body>");
+  client.println("<h1>A Webserver Tutorial </h1>");
+  client.println("<h2>Observing State Of Switch</h2>");
+  client.println("</body>");
+  client.println("</html>");
+  delay(1);
+  client.stop();
   
   /*if (!buttonUp && buttonWasUp) {
     delay(10);
@@ -72,7 +94,7 @@ void loop() {
     }
   }*/
 
-  if ( ! rfid.PICC_IsNewCardPresent())
+  /*if ( ! rfid.PICC_IsNewCardPresent())
     return;
   if ( ! rfid.PICC_ReadCardSerial())
     return;
@@ -114,7 +136,7 @@ void loop() {
   // Stop encryption on PCD
   rfid.PCD_StopCrypto1();
   
-  buttonWasUp = buttonUp;
+  buttonWasUp = buttonUp;*/
   
 }
 
