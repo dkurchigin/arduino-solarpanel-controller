@@ -11,6 +11,8 @@
 #define ANOTHER_GND A3
 #define SS_PIN 8
 #define RST_PIN 7
+#define bufferMax 128
+char buffer[bufferMax];
 
 boolean doorIsOpen = false;
 boolean buttonWasUp = true;
@@ -41,6 +43,7 @@ void setup() {
   digitalWrite(ANOTHER_GND, LOW);
 
   Ethernet.begin(mac, ip);
+  delay(300);
   server.begin();
   delay(1000);
   Serial.println("connecting...");
@@ -56,31 +59,14 @@ void setup() {
 
 
 void loop() {
-  boolean buttonUp = digitalRead(BUTTON);
+  /*boolean buttonUp = digitalRead(BUTTON);
   statusPresentation(0);
   if (doorIsOpen) {
     statusPresentation(3);
-  }
+  }*/
+  client = server.available();
+  getPostRequest();
 
-  EthernetClient client = server.available();
-
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println("Connnection: close");
-  client.println();
-  client.println("<!DOCTYPE html>");   //web страница создана с помощью html
-  client.println("<html>");
-  client.println("<head>");
-  client.println("<title>Ethernet Tutorial</title>");
-  client.println("<meta http-equiv=\"refresh\" content=\"1\">");
-  client.println("</head>");
-  client.println("<body>");
-  client.println("<h1>A Webserver Tutorial </h1>");
-  client.println("<h2>Observing State Of Switch</h2>");
-  client.println("</body>");
-  client.println("</html>");
-  delay(1);
-  client.stop();
   
   /*if (!buttonUp && buttonWasUp) {
     delay(10);
@@ -198,7 +184,7 @@ void changeSolenoidState(int command) {
   if (command == 0) {
     statusPresentation(1);
     changeSolenoidState(1);
-    delay(5000);
+    delay(300);
   } else if (command == 1) {
     digitalWrite(SOLENOID, LOW);
   } else if (command == 2) {
@@ -241,3 +227,46 @@ void statusPresentation(int command) {
   }
 }
 
+void getPostRequest() {
+  if (client) {
+    boolean currentLineIsBlank = true;
+    int bufferSize = 0;
+    while (client.connected()) {
+      if(client.available()){
+        char c = client.read();
+        if (c == '\n' && currentLineIsBlank) {
+          while(client.available()) {  
+            char post = client.read();   
+            if(bufferSize < bufferMax)
+              buffer[bufferSize++] = post;  // сохраняем новый символ в буфере и создаем приращение bufferSize 
+          }
+          Serial.println("Received POST request:");
+          // Разбор HTTP POST запроса                  
+          //ParseReceivedRequest();
+          // Выполнение команд
+          //PerformRequestedCommands();
+          // Отправка ответа
+          //sendResponse();
+          //changeSolenoidState(1);
+          statusPresentation(1);
+          sendResponse();
+        } 
+        else if (c == '\n') {
+          currentLineIsBlank = true;
+        } 
+        else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+      }
+    }
+  }
+}
+
+void sendResponse() {
+  Serial.println("Sending response");
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println("Connection: close");
+  client.stop();
+  delay(200);
+}
