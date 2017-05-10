@@ -16,6 +16,7 @@ char buffer[bufferMax];
 
 boolean doorIsOpen = false;
 boolean buttonWasUp = true;
+int state = 0;
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress pi_server(192, 168, 8, 2); 
@@ -59,26 +60,19 @@ void setup() {
 
 
 void loop() {
-  /*boolean buttonUp = digitalRead(BUTTON);
-  statusPresentation(0);
-  if (doorIsOpen) {
-    statusPresentation(3);
-  }*/
   client = server.available();
   getPostRequest();
-
-  
-  /*if (!buttonUp && buttonWasUp) {
-    delay(10);
-    buttonUp = digitalRead(BUTTON);
-    if (!buttonUp) {
-      digitalWrite(GREEN_LED, HIGH);
-      sendRequest();
-      delay(100);
-      sendPost();
-      digitalWrite(GREEN_LED, LOW);
-    }
-  }*/
+  if (state == 1) {
+    //changeSolenoidState(1);
+    statusPresentation(1);
+    delay(100);
+    state = 0;
+    changeSolenoidState(1);
+    //digitalWrite(SOLENOID, LOW);
+    
+  } else {
+    statusPresentation(0);
+  }
 
   /*if ( ! rfid.PICC_IsNewCardPresent())
     return;
@@ -158,7 +152,6 @@ void sendPost() {
   } else {
     Serial.println("connection failed");
     changeSolenoidState(0);
-    //changeSolenoidState(2);
   }  
 }
 
@@ -181,21 +174,17 @@ int sendReedState() {
 }
 
 void changeSolenoidState(int command) {
-  if (command == 0) {
-    statusPresentation(1);
-    changeSolenoidState(1);
-    delay(300);
-  } else if (command == 1) {
+  if (command == 1) {
     digitalWrite(SOLENOID, LOW);
   } else if (command == 2) {
     digitalWrite(SOLENOID, HIGH); 
   }
-  if (sendReedState() == 1) {
+  /*if (sendReedState() == 1) {
       changeSolenoidState(2);
       statusPresentation(0);  
     } else {
       statusPresentation(3);
-    }
+    }*/
 }
 
 void statusPresentation(int command) {
@@ -248,7 +237,8 @@ void getPostRequest() {
           // Отправка ответа
           //sendResponse();
           //changeSolenoidState(1);
-          statusPresentation(1);
+          //statusPresentation(1);
+          state = 1;
           sendResponse();
         } 
         else if (c == '\n') {
