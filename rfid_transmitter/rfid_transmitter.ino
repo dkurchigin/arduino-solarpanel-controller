@@ -14,9 +14,13 @@
 #define bufferMax 128
 char buffer[bufferMax];
 
+char unique_id[] = "xkkshvq3l9";
 boolean doorIsOpen = false;
-boolean buttonWasUp = true;
-int state = 0;
+int state = 0;   /*   0-ready
+                      1-success
+                      2-failed
+                      3-opened
+*/
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress pi_server(192, 168, 8, 2); 
@@ -60,19 +64,24 @@ void setup() {
 
 
 void loop() {
+  readReedSwitch();
   client = server.available();
   getPostRequest();
-  if (state == 1) {
-    //changeSolenoidState(1);
-    statusPresentation(1);
-    delay(100);
-    state = 0;
-    changeSolenoidState(1);
-    //digitalWrite(SOLENOID, LOW);
-    
-  } else {
+
+  if (state == 0) {
     statusPresentation(0);
+    changeSolenoidState(1);
+  } else if (state == 1) {
+    statusPresentation(1);
+    changeSolenoidState(0);
+  } else if (state == 2) {
+    statusPresentation(2);
+    changeSolenoidState(1);
+  } else if (state == 3) {
+    statusPresentation(3);
+    changeSolenoidState(0);
   }
+
 
   /*if ( ! rfid.PICC_IsNewCardPresent())
     return;
@@ -162,29 +171,21 @@ void printDec(byte *buffer, byte bufferSize) {
   }
 }
 
-int sendReedState() {
-  int state = digitalRead(REED_SWITCH);
-  if (state == 0) {
+void readReedSwitch() {
+  int reedState = digitalRead(REED_SWITCH);
+  if (reedState == 0) {
     doorIsOpen = true;
   } else {
     doorIsOpen = false;
   }
-  Serial.println(state);
-  return state;
 }
 
 void changeSolenoidState(int command) {
-  if (command == 1) {
+  if (command == 0) {
     digitalWrite(SOLENOID, LOW);
-  } else if (command == 2) {
+  } else if (command == 1) {
     digitalWrite(SOLENOID, HIGH); 
   }
-  /*if (sendReedState() == 1) {
-      changeSolenoidState(2);
-      statusPresentation(0);  
-    } else {
-      statusPresentation(3);
-    }*/
 }
 
 void statusPresentation(int command) {
@@ -198,7 +199,7 @@ void statusPresentation(int command) {
   } else if (command == 2) {
     tone(BUZZER, 500, 200);
   } else if (command == 3) {
-    digitalWrite(RED_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
     digitalWrite(GREEN_LED, HIGH);
     tone(BUZZER, 800, 100);
     delay(200);
@@ -206,14 +207,7 @@ void statusPresentation(int command) {
     digitalWrite(GREEN_LED, LOW);
     tone(BUZZER, 800, 100);
     delay(200);
-  } else if (command == 4) {
-    digitalWrite(RED_LED, LOW);
-    digitalWrite(GREEN_LED, HIGH);
-    delay(100);
-    digitalWrite(RED_LED, HIGH);
-    digitalWrite(GREEN_LED, LOW);
-    delay(100);
-  }
+  } 
 }
 
 void getPostRequest() {
