@@ -18,7 +18,7 @@ char unique_id[] = "xkkshvq3l9";
 boolean doorIsOpen = false;
 int state = 0;   /*   0-ready
                       1-success
-                      2-failed 
+                      2-failedd 
                       3-opened
 */
 
