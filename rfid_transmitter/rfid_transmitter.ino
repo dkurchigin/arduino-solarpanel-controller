@@ -83,7 +83,7 @@ void loop() {
   }
 
 
-  /*if ( ! rfid.PICC_IsNewCardPresent())
+  if ( ! rfid.PICC_IsNewCardPresent())
     return;
   if ( ! rfid.PICC_ReadCardSerial())
     return;
@@ -125,11 +125,9 @@ void loop() {
   // Stop encryption on PCD
   rfid.PCD_StopCrypto1();
   
-  buttonWasUp = buttonUp;*/
-  
 }
 
-void sendRequest() {
+/*void sendRequest() {
   client.stop();
   if(client.connect(pi_server, 80)) {
     Serial.println("connected");
@@ -140,7 +138,7 @@ void sendRequest() {
   } else {
     Serial.println("connection failed");
   }
-}
+}*/
 
 void sendPost() {
   client.stop();
@@ -153,14 +151,22 @@ void sendPost() {
     client.println("Content-Type: application/x-www-form-urlencoded");
     client.println("Connection: close");
     client.print("Content-Length: ");
-    client.println("22");
+    client.println("34"); //old 22 previos 28
     client.println();
-    client.print("name=post88&color=pink");
+    client.print("reader=");
+    client.print(unique_id);
+    client.print("&nuid=");
+    client.print(rfid.uid.uidByte[0]);
+    client.print(rfid.uid.uidByte[1]);
+    client.print(rfid.uid.uidByte[2]);
+    client.print(rfid.uid.uidByte[3]);
     client.println();
     changeSolenoidState(0);
+    statusPresentation(1);
   } else {
     Serial.println("connection failed");
     changeSolenoidState(0);
+    statusPresentation(1);
   }  
 }
 
@@ -183,6 +189,7 @@ void readReedSwitch() {
 void changeSolenoidState(int command) {
   if (command == 0) {
     digitalWrite(SOLENOID, LOW);
+    delay(200);
   } else if (command == 1) {
     digitalWrite(SOLENOID, HIGH); 
   }
