@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include <Ethernet2.h>
 #include <MFRC522.h>
-#include <string.h>
+
 
 #define BUTTON 9
 #define BUZZER 3
@@ -269,14 +269,6 @@ void sendResponse() {
 void parseCommand() {
   Serial.println(buffer);
   readString = buffer;
-  /*if (readString.indexOf('action=close') > 0) {
-    state = 2;
-    Serial.println(state);
-  } 
-  if (readString.indexOf('action=open') > 0) {
-    state = 1;
-    Serial.println(state);
-  }*/
   if (readString.substring(0) == "action=close") {
     state = 2;
     Serial.println(state);
