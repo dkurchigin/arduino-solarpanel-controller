@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <Ethernet2.h>
 #include <MFRC522.h>
+#include <string.h>
 
 #define BUTTON 9
 #define BUZZER 3
@@ -15,7 +16,9 @@
 char buffer[bufferMax];
 
 char unique_id[] = "xkkshvq3l9";
+char command[] = "action=close";
 boolean doorIsOpen = false;
+String readString = String(128);
 int state = 0;   /*   0-ready
                       1-success
                       2-failed
@@ -74,9 +77,13 @@ void loop() {
   } else if (state == 1) {
     statusPresentation(1);
     changeSolenoidState(0);
+    delay(3000);
+    state = 0;
   } else if (state == 2) {
     statusPresentation(2);
+    delay(1000);
     changeSolenoidState(1);
+    state = 0;
   } else if (state == 3) {
     statusPresentation(3);
     changeSolenoidState(0);
@@ -142,8 +149,6 @@ void loop() {
 
 void sendPost() {
   client.stop();
-  char str[] = "name=post88";
-  char str2[] = "color=yellow";
   if(client.connect(pi_server, 80)) {
     Serial.println("connected");
     client.println("POST /test_params.pl HTTP/1.1");
@@ -189,7 +194,6 @@ void readReedSwitch() {
 void changeSolenoidState(int command) {
   if (command == 0) {
     digitalWrite(SOLENOID, LOW);
-    delay(200);
   } else if (command == 1) {
     digitalWrite(SOLENOID, HIGH); 
   }
@@ -239,7 +243,7 @@ void getPostRequest() {
           //sendResponse();
           //changeSolenoidState(1);
           //statusPresentation(1);
-          state = 1;
+          parseCommand();
           sendResponse();
         } 
         else if (c == '\n') {
@@ -261,3 +265,25 @@ void sendResponse() {
   client.stop();
   delay(200);
 }
+
+void parseCommand() {
+  Serial.println(buffer);
+  readString = buffer;
+  /*if (readString.indexOf('action=close') > 0) {
+    state = 2;
+    Serial.println(state);
+  } 
+  if (readString.indexOf('action=open') > 0) {
+    state = 1;
+    Serial.println(state);
+  }*/
+  if (readString.substring(0) == "action=close") {
+    state = 2;
+    Serial.println(state);
+  }
+  if (readString.substring(0) == "action=open") {
+    state = 1;
+    Serial.println(state);
+  }
+}
+
