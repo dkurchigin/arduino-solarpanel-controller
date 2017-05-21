@@ -269,12 +269,12 @@ void sendResponse() {
 void parseCommand() {
   Serial.println(buffer);
   readString = buffer;
-  if (readString.substring(0) == "action=close") {
-    state = 2;
-    Serial.println(state);
-  }
   if (readString.substring(0) == "action=open") {
     state = 1;
+    Serial.println(state);
+  }
+  if (readString.substring(0) == "action=clse") {
+    state = 2;
     Serial.println(state);
   }
 }
