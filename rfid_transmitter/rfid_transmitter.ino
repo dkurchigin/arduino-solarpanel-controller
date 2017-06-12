@@ -2,11 +2,10 @@
 #include <Ethernet2.h>
 #include <MFRC522.h>
 
-
 #define BUTTON 9
 #define BUZZER 3
 #define GREEN_LED 5
-#define RED_LED 4
+#define RED_LED A4
 #define REED_SWITCH 6
 #define SOLENOID A2
 #define ANOTHER_GND A3
@@ -30,11 +29,9 @@ IPAddress pi_server(192, 168, 8, 2);
 IPAddress ip(192, 168, 8, 8);
 EthernetClient client;
 EthernetServer server(80);
-
 MFRC522 rfid(SS_PIN, RST_PIN); 
 MFRC522::MIFARE_Key key;
 byte nuidPICC[3];
-
 
 void setup() {
   Serial.begin(9600);
@@ -49,13 +46,14 @@ void setup() {
   digitalWrite(RED_LED, HIGH);
   digitalWrite(GREEN_LED, LOW);
   digitalWrite(ANOTHER_GND, LOW);
+  Serial.println("Init hardware peripherals");
 
   Ethernet.begin(mac, ip);
   delay(300);
   server.begin();
   delay(1000);
   Serial.println("connecting...");
-
+   
   SPI.begin(); // Init SPI bus
   rfid.PCD_Init(); // Init MFRC522 
   for (byte i = 0; i < 6; i++) {
@@ -88,7 +86,6 @@ void loop() {
     statusPresentation(3);
     changeSolenoidState(0);
   }
-
 
   if ( ! rfid.PICC_IsNewCardPresent())
     return;
@@ -134,19 +131,6 @@ void loop() {
   
 }
 
-/*void sendRequest() {
-  client.stop();
-  if(client.connect(pi_server, 80)) {
-    Serial.println("connected");
-    client.println("GET /test_params.pl?name=ardu88&color=nicegreen HTTP/1.1");
-    client.println("Host: 192.168.8.2");
-    client.println("Connection: close");
-    client.println();
-  } else {
-    Serial.println("connection failed");
-  }
-}*/
-
 void sendPost() {
   client.stop();
   if(client.connect(pi_server, 80)) {
@@ -166,12 +150,9 @@ void sendPost() {
     client.print(rfid.uid.uidByte[2]);
     client.print(rfid.uid.uidByte[3]);
     client.println();
-    changeSolenoidState(0);
-    statusPresentation(1);
+    Serial.println("Send post...");
   } else {
-    Serial.println("connection failed");
-    changeSolenoidState(0);
-    statusPresentation(1);
+    //Serial.println("connection failed");
   }  
 }
 
@@ -234,17 +215,11 @@ void getPostRequest() {
             if(bufferSize < bufferMax)
               buffer[bufferSize++] = post;  // сохраняем новый символ в буфере и создаем приращение bufferSize 
           }
-          Serial.println("Received POST request:");
-          // Разбор HTTP POST запроса                  
-          //ParseReceivedRequest();
-          // Выполнение команд
-          //PerformRequestedCommands();
-          // Отправка ответа
-          //sendResponse();
-          //changeSolenoidState(1);
-          //statusPresentation(1);
+          Serial.println("Receive POST request...");
+          Serial.println("Parse...");
           parseCommand();
           sendResponse();
+          Serial.println("Send response...");
         } 
         else if (c == '\n') {
           currentLineIsBlank = true;
@@ -271,11 +246,11 @@ void parseCommand() {
   readString = buffer;
   if (readString.substring(0) == "action=open") {
     state = 1;
-    Serial.println(state);
+    Serial.println("Open the door...");
   }
   if (readString.substring(0) == "action=clse") {
     state = 2;
-    Serial.println(state);
+    Serial.println("Closing door...");
   }
 }
 
